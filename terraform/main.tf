@@ -33,17 +33,18 @@ resource vsphere_virtual_machine "hashistack" {
         "guestinfo.metadata.encoding" = "gzip+base64"
 
         "guestinfo.userdata" = base64gzip(templatefile("./cloud-config/user_template.yml", {
-            hostname   = each.value.hostname
-            ipaddress  = each.value.ipaddress
-            server     = each.value.server
-            serverlist = local.server_list
-            username   = var.vm_username
-            datacenter = var.nomad_datacenter
-            token      = var.consul_token
-            auth       = var.docker_auth
-            ssh_team   = var.smallstep_team
-            ssh_token  = var.smallstep_token
-            ssh_tag    = var.smallstep_tag
+            hostname    = each.value.hostname
+            ipaddress   = each.value.ipaddress
+            server      = each.value.server
+            serverlist  = local.server_list
+            servercount = local.server_count
+            username    = var.vm_username
+            datacenter  = var.nomad_datacenter
+            token       = var.consul_token
+            auth        = var.docker_auth
+            ssh_team    = var.smallstep_team
+            ssh_token   = var.smallstep_token
+            ssh_tag     = var.smallstep_tag
         }))
         "guestinfo.userdata.encoding" = "gzip+base64"
     }

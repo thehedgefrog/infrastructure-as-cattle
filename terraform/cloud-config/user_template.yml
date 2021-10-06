@@ -22,7 +22,7 @@ write_files:
     %{ endif }
 
     bind_addr = "${ipaddress}" #same as vm ip
-    bootstrap_expect=3
+    bootstrap_expect=${servercount}
     encrypt = "${token}"
     retry_join = ${serverlist}
   path: /home/${username}/consul.hcl
