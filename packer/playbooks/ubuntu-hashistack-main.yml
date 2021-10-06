@@ -1,0 +1,31 @@
+---
+- name: Setup new Ubuntu Hashicorp-stack instance
+  hosts: default
+  vars_files: ./vars.yml
+  become: yes
+
+  tasks:
+
+### USER AND SSH TASKS ###
+  - name: user tasks
+    include: setup-users.yml
+
+### TIME/NTP SETTINGS ###
+  - name: ubuntu set ntp
+    include: ubuntu-set-ntp.yml
+
+### SHELL ###
+  - name: setup interface
+    include: setup-interface.yml
+
+### HASHI STACK ###
+  - name: install hashicorp stack
+    include: setup-hashistack.yml
+
+### DOCKER ###
+  - name: install docker
+    include: setup-docker.yml
+
+### UPDATE CLOUD-INIT ###
+  - name: update cloud-init
+    include: update-cloudinit.yml

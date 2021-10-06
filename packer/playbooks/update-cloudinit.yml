@@ -1,0 +1,24 @@
+# This installs the Proposed repo, installs the latest cloud-init, reconfigures the sources, and then removes the repo
+
+  - name: add proposed repo
+    apt_repository:
+      mode: 0644
+      repo: "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ focal-proposed restricted main"
+      update_cache: yes
+
+  - name: install cloud-init
+    apt:
+      name: cloud-init=21.3-1-g6803368d-0ubuntu1~20.04.3
+      state: present
+
+  - name: update cloud-init sources
+    copy:
+      dest: "/etc/cloud/cloud.cfg.d/90_dpkg.cfg"
+      content: |
+        # to update this file, run dpkg-reconfigure cloud-init
+        datasource_list: [ NoCloud, OVF, VMware ]
+
+  - name: remove proposed repo
+    apt_repository:
+      repo: "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ focal-proposed restricted main"
+      state: absent

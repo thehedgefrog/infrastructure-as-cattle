@@ -1,0 +1,122 @@
+# This installs Consul, Nomad and Vault, and enables their services
+
+- name: add hashicorp gpg key
+  apt_key:
+    url: https://apt.releases.hashicorp.com/gpg
+    state: present
+
+- name: add hashicorp repo
+  apt_repository:
+    mode: 0644
+    repo: "deb [arch=amd64] https://apt.releases.hashicorp.com focal main"
+    update_cache: yes
+
+- name: install consul/nomad/vault
+  apt:
+    pkg:
+    - consul
+    - nomad
+    - vault
+    state: latest
+
+- name: write consul service file
+  copy:
+    dest: "/etc/systemd/system/consul.service"
+    content: |
+      [Unit]
+      Description=Consul Agent
+      Wants=network-online.target
+      After=network-online.target
+
+      [Service]
+      User=root
+      Group=root
+      Environment=GOMAXPROCS=2
+      Restart=on-failure
+      ExecStart=/usr/bin/consul agent -config-dir=/home/{{ mainuser.name }}/consul.hcl
+      ExecReload=/bin/kill -HUP $MAINPID
+      KillSignal=SIGINT
+      KillMode=process
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: enable consul service
+  service:
+    name: consul
+    enabled: yes
+
+- name: write nomad service file
+  copy:
+    dest: "/etc/systemd/system/nomad.service"
+    content: |
+      [Unit]
+      Description=Nomad Agent
+      Requires=consul.service
+      After=consul.service
+
+      [Service]
+      User=root
+      Group=root
+      Environment=GOMAXPROCS=2
+      Restart=on-failure
+      ExecStart=/usr/bin/nomad agent -config=home/{{ mainuser.name }}/nomad.hcl
+      ExecReload=/bin/kill -HUP $MAINPID
+      KillSignal=SIGINT
+      KillMode=process
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: enable nomad service
+  service:
+    name: nomad
+    enabled: yes
+
+- name: write vault service file
+  copy:
+    dest: "/etc/systemd/system/vault.service"
+    content: |
+      [Unit]
+      Description="HashiCorp Vault"
+      Documentation=https://www.vaultproject.io/docs/
+      Requires=network-online.target
+      After=network-online.target
+      ConditionFileNotEmpty=/etc/vault.d/vault.hcl
+      StartLimitIntervalSec=60
+      StartLimitBurst=3
+
+      [Service]
+      User=vault
+      Group=vault
+      ProtectSystem=full
+      ProtectHome=read-only
+      PrivateTmp=yes
+      PrivateDevices=yes
+      SecureBits=keep-caps
+      AmbientCapabilities=CAP_IPC_LOCK
+      Capabilities=CAP_IPC_LOCK+ep
+      CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
+      NoNewPrivileges=yes
+      ExecStart=/usr/bin/vault server -config=/home/{{ mainuser.name }}/vault.hcl
+      ExecReload=/bin/kill --signal HUP $MAINPID
+      KillMode=process
+      KillSignal=SIGINT
+      Restart=on-failure
+      RestartSec=5
+      TimeoutStopSec=30
+      StartLimitInterval=60
+      StartLimitIntervalSec=60
+      StartLimitBurst=3
+      LimitNOFILE=65536
+      LimitMEMLOCK=infinity
+      LogRateLimitIntervalSec=0
+      LogRateLimitBurst=0
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: enable vault service
+  service:
+    name: vault
+    enabled: yes

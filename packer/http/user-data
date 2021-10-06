@@ -1,0 +1,43 @@
+#cloud-config
+autoinstall:
+  version: 1
+  early-commands:
+      # Stop ssh for packer
+       - sudo systemctl stop ssh
+  apt:
+    geoip: true
+    preserve_sources_list: false
+    primary:
+    - arches: [amd64, i386]
+      uri: http://archive.ubuntu.com/ubuntu
+    - arches: [default]
+      uri: http://ports.ubuntu.com/ubuntu-ports
+  identity: {hostname: ubuntu-server, password: $6$/BsEesdMOg83eXMB$DDxXXNXWU7bEAIYVXrSqSEl8QH7tDcbmFa4JtT503gPfa5gi3LCQveOYdOj1xuB5VJ8K21AGkBE32VfJBFI8K.,
+    realname: packer, username: packer}
+  keyboard:
+      layout: en
+      variant: us
+  locale: en_US
+  network:
+    ethernets:
+      ens192: {dhcp4: true}
+    version: 2
+  ssh:
+    allow-pw: true
+    authorized-keys: []
+    install-server: true
+  user-data:
+      timezone: America/Toronto
+      disable_root: false
+  ca-certs:
+    remove-defaults: false
+  storage:
+      layout:
+          name: direct
+  late-commands:
+    - sed -i -e 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/g' /target/etc/ssh/sshd_config
+    - sed -i -e 's/^#\?PermitRootLogin.*/PermitRootLogin yes/g' /target/etc/ssh/sshd_config
+    - echo 'packer ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/packer
+    - curtin in-target --target=/target -- chmod 440 /etc/sudoers.d/packer
+    - curtin in-target --target=/target -- apt-get update
+    - curtin in-target --target=/target -- apt-get upgrade --yes

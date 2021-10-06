@@ -1,0 +1,6 @@
+---
+mainuser:
+  name: myuser
+  groups: sudo
+  ssh_key: ssh-rsa AAAA....
+  password: encoded password

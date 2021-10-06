@@ -1,0 +1,25 @@
+# This installs the latest stable version of Docker
+
+- name: add docker gpg key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: add docker repo
+  apt_repository:
+    mode: 0644
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+    update_cache: yes
+
+- name: install docker packages
+  apt:
+    pkg:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    state: latest
+
+- name: enable docker service
+  service:
+    name: docker
+    enabled: yes

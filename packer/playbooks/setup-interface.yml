@@ -1,0 +1,68 @@
+# This OPTIONAL step sets up ZShell.  You must have an existing config file to skip the setup phase.
+
+  - name: OhMyZsh folder exists check
+    stat:
+      path: /home/{{ mainuser.name }}/.oh-my-zsh
+    register: ohmyzsh_folder
+
+  - name: Install ZShell
+    package:
+      update_cache: yes
+      name:
+        - zsh
+        - git
+        - wget
+      state: present
+
+  - name: Download OhMyZsh
+    get_url:
+      url: https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh
+      dest: /tmp/zsh-installer.sh
+      mode: "0555"
+    when: ohmyzsh_folder.stat.exists == false
+
+  - name: Execute OhMyZsh Script
+    shell: /tmp/zsh-installer.sh --unattended
+    when: ohmyzsh_folder.stat.exists == false
+
+  - name: Copy Oh My Zsh folder to {{ mainuser.name }}
+    copy:
+      remote_src: yes
+      src: /root/.oh-my-zsh
+      dest: /home/{{ mainuser.name }}/
+      owner: "{{ mainuser.name }}"
+      mode: 0755
+      directory_mode: 0755
+
+  - name: Remove OhMyZsh Script
+    file: path=/tmp/zsh-installer.sh state=absent
+
+  - name: Clone zsh Autosuggestions
+    git:
+      repo: https://github.com/zsh-users/zsh-autosuggestions
+      dest: /home/{{ mainuser.name }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+
+  - name: Clone zsh SyntaxHighlighting
+    git:
+      repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
+      dest: /home/{{ mainuser.name }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+
+  - name: Clone zsh Powerlevel10k
+    git:
+      repo: https://github.com/romkatv/powerlevel10k.git
+      dest: /home/{{ mainuser.name }}/.oh-my-zsh/themes/powerlevel10k
+
+  - name: copy p10k config file
+    copy:
+      src: ./templates/.p10k.zsh
+      dest: /home/{{ mainuser.name }}/.p10k.zsh
+
+  - name: copy zshrc config file
+    copy:
+      src: ./templates/.zshrc
+      dest: /home/{{ mainuser.name }}/.zshrc
+
+  - name: Set zsh as default shell
+    user:
+      name: "{{ mainuser.name }}"
+      shell: /bin/zsh

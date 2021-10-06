@@ -1,0 +1,16 @@
+instance-id: ${hostname}
+local-hostname: ${hostname}
+network:
+  version: 2
+  ethernets:
+    ens192:
+      dhcp4: false
+      addresses:
+        - ${ipaddress}/16
+      gateway4: 10.200.0.1
+      nameservers:
+        addresses:
+          - 10.200.0.2
+          - 10.200.0.1
+          - 1.1.1.1
+      optional: true

@@ -1,0 +1,17 @@
+# This adds users and sets up SSH
+
+  - name: add main user
+    user:
+      name: "{{ mainuser.name }}"
+      groups: "{{ mainuser.groups }}"
+      password: "{{ mainuser.password }}"
+
+  - name: create ssh directory
+    file:
+      path: "/home/{{ mainuser.name }}/.ssh"
+      state: directory
+
+  - name: add ssh keys to main user
+    copy:
+      dest: "/home/{{ mainuser.name }}/.ssh/authorized_keys"
+      content: "{{ mainuser.ssh_key }}"

@@ -1,0 +1,22 @@
+# This stops NTP, copies a file with the right data and restarts NTP
+
+  - name: stop timesyncd
+    systemd:
+      name: systemd-timesyncd.service
+      state: stopped
+
+  - name: write conf file
+    copy:
+      dest: "/etc/systemd/timesyncd.conf"
+      content: |
+        [Time]
+        NTP=10.200.0.1
+        FallbackNTP=time.cloudflare.com
+        RootDistanceMaxSec=5
+        PollIntervalMinSec=32
+        PollIntervalMaxSec=2048
+
+  - name: start timesyncd
+    systemd:
+      name: systemd-timesyncd.service
+      state: started

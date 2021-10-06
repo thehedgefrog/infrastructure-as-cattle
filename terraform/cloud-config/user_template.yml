@@ -1,0 +1,107 @@
+#cloud-config
+
+ssh_pwauth: false
+disable_root: true
+
+packages:
+  - nfs-common
+
+write_files:
+
+- content: |
+    datacenter = "${datacenter}"
+    data_dir = "/opt/consul"
+    client_addr = "0.0.0.0"
+
+    ui_config{
+      enabled = true
+    }
+
+    %{ if server == true }server = true
+    %{ else }server = false
+    %{ endif }
+
+    bind_addr = "${ipaddress}" #same as vm ip
+    bootstrap_expect=3
+    encrypt = "${token}"
+    retry_join = ${serverlist}
+  path: /home/${username}/consul.hcl
+  permissions: '0755'
+
+- content: |
+    data_dir = "/opt/nomad/data"
+    bind_addr = "0.0.0.0"
+    datacenter = "${datacenter}"
+    region = "CAN"
+
+    server {
+      %{ if server == true }enabled = true
+      bootstrap_expect = 3
+      %{ else }enabled = false
+      %{ endif }
+    }
+
+    acl {
+      enabled = false
+    }
+
+    client {
+      enabled = true
+
+      options {
+        docker.auth.config = "/root/.docker/config.json"
+        docker.privileged.enabled = true
+        driver.raw_exec.enable = "1"
+      }
+    }
+
+    telemetry {
+      disable_hostname = true
+      prometheus_metrics = true
+      publish_allocation_metrics = true
+      publish_node_metrics = true
+      use_node_name = false
+    }
+
+    consul {
+      address = "127.0.0.1:8500"
+      client_service_name = "nomad-client"
+      auto_advertise = true
+      server_auto_join = true
+      client_auto_join = true
+    }
+  path: /home/${username}/nomad.hcl
+  permissions: '0755'
+
+- content: |
+    ui = true
+
+    storage "consul" {
+      address = "127.0.0.1:8500"
+      path    = "vault"
+    }
+
+    listener "tcp" {
+      address = "0.0.0.0:8200"
+      tls_disable = "true"
+    }
+  path: /home/${username}/vault.hcl
+  permissions: '0755'
+
+- content: |
+    {
+      "auths": {
+        "REGISTRY": {
+          "auth": "${auth}"
+        }
+      }
+    }
+  path: /root/.docker/config.json
+  permissions: '0644'
+
+
+runcmd:
+  - 'curl -sSLO https://files.smallstep.com/ssh-host.sh'
+  - 'bash ssh-host.sh --team "${ssh_team}" --token "${ssh_token}" --hostname "${ipaddress}" --tag "${ssh_tag}"'
+  - 'mkdir /mnt/container'
+  - 'mount 10.20.100.1:/Container /mnt/container'

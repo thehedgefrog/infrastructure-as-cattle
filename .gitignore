@@ -1,0 +1,6 @@
+*/.archive
+*/.terraform
+*.tfstate*
+*.lock.hcl
+*/packer_cache
+*/non-demo
