@@ -46,6 +46,5 @@ When you want to get rid of your VMs, run `terraform destroy`.
 | SSH username | SSH password |
 | --- | --- |
 | packer | packer |
-|
 
 ### That's it!

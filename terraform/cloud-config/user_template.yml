@@ -103,5 +103,3 @@ write_files:
 runcmd:
   - 'curl -sSLO https://files.smallstep.com/ssh-host.sh'
   - 'bash ssh-host.sh --team "${ssh_team}" --token "${ssh_token}" --hostname "${ipaddress}" --tag "${ssh_tag}"'
-  - 'mkdir /mnt/container'
-  - 'mount 10.20.100.1:/Container /mnt/container'
