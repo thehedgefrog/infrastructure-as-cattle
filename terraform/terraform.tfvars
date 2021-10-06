@@ -16,25 +16,25 @@ template_name   = "linux-ubuntu-server-20.04.3-lts-hashicorp"
 
 # CLOUD INIT VARIABLES
 
-server_map   = {
+server_map = {
 
-    "hashistack-s01" = {
-        hostname  = "server-s01"
-        ipaddress = "10.2.2.1"
-        server    = true
-    }
+  "hashistack-s01" = {
+    hostname  = "server-s01"
+    ipaddress = "10.2.2.1"
+    server    = true
+  }
 
-    "hashistack-s02" = {
-        hostname  = "server-s02"
-        ipaddress = "10.2.2.2"
-        server    = true
-    }
+  "hashistack-s02" = {
+    hostname  = "server-s02"
+    ipaddress = "10.2.2.2"
+    server    = true
+  }
 
-    "hashistack-s03" = {
-        hostname  = "server-s03"
-        ipaddress = "10.2.2.3"
-        server    = true
-    }
+  "hashistack-s03" = {
+    hostname  = "server-s03"
+    ipaddress = "10.2.2.3"
+    server    = true
+  }
 }
 
 nomad_datacenter = "dc"
