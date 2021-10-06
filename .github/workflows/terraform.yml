@@ -29,7 +29,7 @@ jobs:
 
       - name: Run `terraform fmt`
         id: fmt
-        run: terraform fmt -diff -check -no-color -recursive
+        run: terraform fmt -diff -no-color -recursive
 
       - name: Run `terraform init`
         id: init
