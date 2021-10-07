@@ -11,11 +11,13 @@ variable "vsphere_server" {
 variable "vsphere_user" {
   type        = string
   description = "Username of an admin of the vSphere server into which resources will be created."
+  sensitive   = true
 }
 
 variable "vsphere_password" {
   type        = string
   description = "Plaintext password of an admin of the vSphere server into which resources will be created."
+  sensitive   = true
 }
 
 
@@ -80,11 +82,13 @@ variable "vm_username" {
 variable "consul_token" {
   type        = string
   description = "The Consul encryption token"
+  sensitive   = true
 }
 
 variable "docker_auth" {
   type        = string
   description = "The base64 user:password of Docker Hub"
+  sensitive   = true
 }
 
 variable "smallstep_team" {
@@ -95,6 +99,7 @@ variable "smallstep_team" {
 variable "smallstep_token" {
   type        = string
   description = "The Smallstep SSH enrollment token"
+  sensitive   = true
 }
 
 variable "smallstep_tag" {
