@@ -4,3 +4,4 @@
 *.lock.hcl
 */packer_cache
 */non-demo
+*/.vscode
