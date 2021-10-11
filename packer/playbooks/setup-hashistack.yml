@@ -120,3 +120,39 @@
   service:
     name: vault
     enabled: yes
+
+- name: create resolved.conf.d directory
+  file:
+    path: "/etc/systemd/resolved.conf.d"
+    state: directory
+
+- name: create consul dns file
+  copy:
+    dest: "/etc/systemd/resolved.conf.d/consul.conf"
+    content: |
+      [Resolve]
+      DNS=127.0.0.1
+      DNSSEC=false
+      Domains=~consul
+
+- name: edit tcp iptables
+  iptables:
+    table: nat
+    chain: OUTPUT
+    destination: localhost
+    protocol: tcp
+    match: tcp
+    destination_port: 53
+    jump: REDIRECT
+    to_ports: 8600
+
+- name: edit udp iptables
+  iptables:
+    table: nat
+    chain: OUTPUT
+    destination: localhost
+    protocol: udp
+    match: udp
+    destination_port: 53
+    jump: REDIRECT
+    to_ports: 8600
